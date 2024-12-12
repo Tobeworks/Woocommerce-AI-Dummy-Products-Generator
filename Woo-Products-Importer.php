@@ -107,7 +107,6 @@ class WC_Demo_Products_Importer
             <!-- Import Products Form -->
             <form method="post" action="">
                 <?php wp_nonce_field('import_demo_products', 'demo_products_nonce'); ?>
-
                 <table class="form-table">
                     <tr>
                         <th scope="row">
@@ -123,14 +122,51 @@ class WC_Demo_Products_Importer
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="product_category"><?php echo esc_html__('Product Category', 'woo-demo-products'); ?></label>
+                            <label for="generation_category"><?php echo esc_html__('Generate Products Type', 'woo-demo-products'); ?></label>
+                        </th>
+                        <td>
+                            <select name="generation_category" id="generation_category">
+                                <?php
+                                foreach ($this->get_product_categories() as $slug => $name) {
+                                    printf(
+                                        '<option value="%s">%s</option>',
+                                        esc_attr($slug),
+                                        esc_html($name)
+                                    );
+                                }
+                                ?>
+                            </select>
+                            <p class="description">
+                                <?php echo esc_html__('Select the type of products to generate', 'woo-demo-products'); ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="product_category"><?php echo esc_html__('Save Products in Category', 'woo-demo-products'); ?></label>
                         </th>
                         <td>
                             <select name="product_category" id="product_category">
-                                <?php foreach ($this->get_product_categories() as $slug => $name) : ?>
-                                    <option value="<?php echo esc_attr($slug); ?>"><?php echo esc_html($name); ?></option>
-                                <?php endforeach; ?>
+                                <?php
+                                $product_cats = get_terms(array(
+                                    'taxonomy' => 'product_cat',
+                                    'hide_empty' => false,
+                                ));
+
+                                if (!empty($product_cats) && !is_wp_error($product_cats)) {
+                                    foreach ($product_cats as $cat) {
+                                        printf(
+                                            '<option value="%d">%s</option>',
+                                            $cat->term_id,
+                                            esc_html($cat->name)
+                                        );
+                                    }
+                                }
+                                ?>
                             </select>
+                            <p class="description">
+                                <?php echo esc_html__('Select the WooCommerce category where products will be saved', 'woo-demo-products'); ?>
+                            </p>
                         </td>
                     </tr>
                 </table>
@@ -143,16 +179,16 @@ class WC_Demo_Products_Importer
             </form>
         </div>
 <?php
-
         if (isset($_POST['import_demo_products']) && check_admin_referer('import_demo_products', 'demo_products_nonce')) {
-            $this->generate_and_import_products(
-                intval($_POST['product_count']),
-                sanitize_text_field($_POST['product_category'])
-            );
+            $count = isset($_POST['product_count']) ? intval($_POST['product_count']) : 1;
+            $category_id = isset($_POST['product_category']) ? intval($_POST['product_category']) : 0;
+            $generation_category = isset($_POST['generation_category']) ? sanitize_text_field($_POST['generation_category']) : '';
+
+            $this->generate_and_import_products($count, $category_id, $generation_category);
         }
     }
 
-    private function call_openai_api($count, $category)
+    private function call_openai_api($count, $category_name, $language = 'en')
     {
         try {
             if (empty($this->options['openai_api_key'])) {
@@ -164,40 +200,37 @@ class WC_Demo_Products_Importer
                 throw new Exception('Invalid product count. Please select between 1 and 25 products.');
             }
 
-            if (!array_key_exists($category, $this->get_product_categories())) {
-                throw new Exception('Invalid category selected.');
-            }
-
             // Prepare messages for API
             $system_prompt = "You are a product data generator for an ecommerce store. You must respond with valid JSON only.";
 
             $user_prompt = sprintf(
                 'Generate %d realistic products for the category "%s". Return JSON in this exact format:
-    {
-        "products": [
             {
-                "name": "Product Name",
-                "sku": "UNIQUE-SKU-123",
-                "price": "29.99",
-                "sale_price": "24.99",
-                "stock_quantity": 100,
-                "stock_status": "instock",
-                "weight": "1.5",
-                "dimensions": {
-                    "length": "10",
-                    "width": "5",
-                    "height": "2"
-                },
-                "short_description": "Brief product description",
-                "long_description": "Detailed product description",
-                "features": ["feature1", "feature2"],
-                "tags": ["tag1", "tag2"]
-            }
-        ]
-    }',
+                "products": [
+                    {
+                        "name": "Product Name",
+                        "sku": "UNIQUE-SKU-123",
+                        "price": "29.99",
+                        "sale_price": "24.99",
+                        "stock_quantity": 100,
+                        "stock_status": "instock",
+                        "weight": "1.5",
+                        "dimensions": {
+                            "length": "10",
+                            "width": "5",
+                            "height": "2"
+                        },
+                        "short_description": "Brief product description",
+                        "long_description": "Detailed product description",
+                        "features": ["feature1", "feature2"],
+                        "tags": ["tag1", "tag2"]
+                    }
+                ]
+            }',
                 $count,
-                $this->get_product_categories()[$category]
+                $category_name
             );
+
 
             $response = wp_remote_post('https://api.openai.com/v1/chat/completions', array(
                 'timeout' => 60,
@@ -298,7 +331,6 @@ class WC_Demo_Products_Importer
             error_log(sprintf(
                 '[WC Demo Products Importer] Error: %s, Category: %s, Count: %d',
                 $e->getMessage(),
-                $category,
                 $count
             ));
 
@@ -311,133 +343,7 @@ class WC_Demo_Products_Importer
         }
     }
 
-    /** @deprecated */
-    private function generate_and_import_products_($count, $category)
-    {
-        // Call OpenAI API with error handling
-        $products_data = $this->call_openai_api($count, $category);
 
-        if (!$products_data) {
-            return; // Error already displayed
-        }
-
-        $imported_count = 0;
-
-        // Start product import
-        try {
-            foreach ($products_data as $product_data) {
-                // Create product
-                $product = new WC_Product_Simple();
-
-                // Set product data
-                $product->set_name($product_data['name']);
-
-                // Set SKU (with validation)
-                if (!empty($product_data['sku'])) {
-                    // Make sure SKU is unique
-                    $existing_product_id = wc_get_product_id_by_sku($product_data['sku']);
-                    if (!$existing_product_id) {
-                        $product->set_sku($product_data['sku']);
-                    } else {
-                        // Append random string to make SKU unique
-                        $product->set_sku($product_data['sku'] . '-' . substr(uniqid(), -4));
-                    }
-                }
-
-                // Set prices
-                $product->set_regular_price($product_data['price']);
-                if (!empty($product_data['sale_price'])) {
-                    $product->set_sale_price($product_data['sale_price']);
-                }
-
-                // Set stock
-                if (isset($product_data['stock_quantity'])) {
-                    $product->set_stock_quantity($product_data['stock_quantity']);
-                    $product->set_manage_stock(true);
-                }
-
-                if (!empty($product_data['stock_status'])) {
-                    $product->set_stock_status($product_data['stock_status']); // 'instock', 'outofstock', 'onbackorder'
-                }
-
-                // Set dimensions
-                if (!empty($product_data['dimensions'])) {
-                    if (isset($product_data['dimensions']['length'])) {
-                        $product->set_length($product_data['dimensions']['length']);
-                    }
-                    if (isset($product_data['dimensions']['width'])) {
-                        $product->set_width($product_data['dimensions']['width']);
-                    }
-                    if (isset($product_data['dimensions']['height'])) {
-                        $product->set_height($product_data['dimensions']['height']);
-                    }
-                }
-
-                // Set weight
-                if (!empty($product_data['weight'])) {
-                    $product->set_weight($product_data['weight']);
-                }
-
-                // Set descriptions
-                $product->set_description($product_data['long_description']);
-                $product->set_short_description($product_data['short_description']);
-
-                // Set category
-                $term = get_term_by('slug', $category, 'product_cat');
-                if (!$term) {
-                    $term = wp_insert_term(
-                        $this->get_product_categories()[$category],
-                        'product_cat',
-                        array('slug' => $category)
-                    );
-                    if (is_wp_error($term)) {
-                        throw new Exception('Failed to create product category: ' . $term->get_error_message());
-                    }
-                    $product->set_category_ids(array($term['term_id']));
-                } else {
-                    $product->set_category_ids(array($term->term_id));
-                }
-
-                // Add features as product meta
-                if (!empty($product_data['features'])) {
-                    update_post_meta($product->get_id(), '_product_features', $product_data['features']);
-                }
-
-                // Set tags
-                if (!empty($product_data['tags'])) {
-                    $tag_result = wp_set_object_terms($product->get_id(), $product_data['tags'], 'product_tag');
-                    if (is_wp_error($tag_result)) {
-                        throw new Exception('Failed to set product tags: ' . $tag_result->get_error_message());
-                    }
-                }
-
-                // Save product
-                $product_id = $product->save();
-                if (!$product_id) {
-                    throw new Exception('Failed to save product: ' . $product_data['name']);
-                }
-
-                // Add placeholder image
-                $this->set_product_images($product_id, array('https://via.placeholder.com/800x800'));
-
-                $imported_count++;
-            }
-
-            echo '<div class="notice notice-success"><p>' .
-                sprintf(
-                    esc_html__('Successfully imported %d AI-generated products.', 'woo-demo-products'),
-                    $imported_count
-                ) .
-                '</p></div>';
-        } catch (Exception $e) {
-            echo '<div class="error notice"><p>' .
-                sprintf(
-                    esc_html__('Error during product import: %s', 'woo-demo-products'),
-                    esc_html($e->getMessage())
-                ) .
-                '</p></div>';
-        }
-    }
 
 
     private function generate_product_image($product_name, $product_description, $category)
@@ -532,121 +438,63 @@ class WC_Demo_Products_Importer
     }
 
     // Modify the generate_and_import_products method to use AI images
-    private function generate_and_import_products($count, $category)
+    private function generate_and_import_products($count, $category_id, $generation_category, $language = 'en')
     {
-        $products_data = $this->call_openai_api($count, $category);
-
-        if (!$products_data) {
-            return;
-        }
-
-        $imported_count = 0;
-        $image_success_count = 0;
-
         try {
+            // Get save category for verification
+            $category = get_term_by('id', $category_id, 'product_cat');
+            if (!$category) {
+                throw new Exception('Category not found with ID: ' . $category_id);
+            }
+
+            // Get generation category name
+            $generation_categories = $this->get_product_categories();
+            if (!isset($generation_categories[$generation_category])) {
+                throw new Exception('Invalid generation category selected.');
+            }
+
+            // Call OpenAI API with generation category name
+            $products_data = $this->call_openai_api($count, $generation_categories[$generation_category], $language);
+
+            if (!$products_data) {
+                return;
+            }
+
+
+            $imported_count = 0;
+            $image_success_count = 0;
+
             foreach ($products_data as $product_data) {
                 // Create product
                 $product = new WC_Product_Simple();
 
-                // Set product data
+                // Set basic product data
                 $product->set_name($product_data['name']);
-
-                // Set SKU (with validation)
-                if (!empty($product_data['sku'])) {
-                    // Make sure SKU is unique
-                    $existing_product_id = wc_get_product_id_by_sku($product_data['sku']);
-                    if (!$existing_product_id) {
-                        $product->set_sku($product_data['sku']);
-                    } else {
-                        // Append random string to make SKU unique
-                        $product->set_sku($product_data['sku'] . '-' . substr(uniqid(), -4));
-                    }
-                }
-
-                // Set prices
                 $product->set_regular_price($product_data['price']);
-                if (!empty($product_data['sale_price'])) {
-                    $product->set_sale_price($product_data['sale_price']);
-                }
-
-                // Set stock
-                if (isset($product_data['stock_quantity'])) {
-                    $product->set_stock_quantity($product_data['stock_quantity']);
-                    $product->set_manage_stock(true);
-                }
-
-                if (!empty($product_data['stock_status'])) {
-                    $product->set_stock_status($product_data['stock_status']); // 'instock', 'outofstock', 'onbackorder'
-                }
-
-                // Set dimensions
-                if (!empty($product_data['dimensions'])) {
-                    if (isset($product_data['dimensions']['length'])) {
-                        $product->set_length($product_data['dimensions']['length']);
-                    }
-                    if (isset($product_data['dimensions']['width'])) {
-                        $product->set_width($product_data['dimensions']['width']);
-                    }
-                    if (isset($product_data['dimensions']['height'])) {
-                        $product->set_height($product_data['dimensions']['height']);
-                    }
-                }
-
-                // Set weight
-                if (!empty($product_data['weight'])) {
-                    $product->set_weight($product_data['weight']);
-                }
-
-                // Set descriptions
                 $product->set_description($product_data['long_description']);
                 $product->set_short_description($product_data['short_description']);
 
-                // Set category
-                $term = get_term_by('slug', $category, 'product_cat');
-                if (!$term) {
-                    $term = wp_insert_term(
-                        $this->get_product_categories()[$category],
-                        'product_cat',
-                        array('slug' => $category)
-                    );
-                    if (is_wp_error($term)) {
-                        throw new Exception('Failed to create product category: ' . $term->get_error_message());
-                    }
-                    $product->set_category_ids(array($term['term_id']));
-                } else {
-                    $product->set_category_ids(array($term->term_id));
-                }
+                // Set the category
+                $product->set_category_ids(array($category_id));
 
-                // Add features as product meta
-                if (!empty($product_data['features'])) {
-                    update_post_meta($product->get_id(), '_product_features', $product_data['features']);
-                }
-
-                // Set tags
-                if (!empty($product_data['tags'])) {
-                    $tag_result = wp_set_object_terms($product->get_id(), $product_data['tags'], 'product_tag');
-                    if (is_wp_error($tag_result)) {
-                        throw new Exception('Failed to set product tags: ' . $tag_result->get_error_message());
-                    }
-                }
-
-                // Save product first to get ID
+                // Save product
                 $product_id = $product->save();
-                if (!$product_id) {
-                    throw new Exception('Failed to save product: ' . $product_data['name']);
-                }
 
                 // Generate and attach AI image
                 $image_url = $this->generate_product_image(
                     $product_data['name'],
                     $product_data['short_description'],
-                    $category
+                    $category->name
                 );
 
-                if ($image_url) {
-                    if ($this->download_and_attach_image($image_url, $product_id, $product_data['name'])) {
-                        $image_success_count++;
-                    }
+                if (
+                    $image_url && $this->download_and_attach_image(
+                        $image_url,
+                        $product_id,
+                        $product_data['name']
+                    )
+                ) {
+                    $image_success_count++;
                 }
 
                 $imported_count++;
