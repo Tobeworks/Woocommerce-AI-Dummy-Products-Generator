@@ -143,6 +143,36 @@ class WC_Demo_Products_Importer
                     </tr>
                     <tr>
                         <th scope="row">
+                            <label for="content_language"><?php echo esc_html__('Content Language', 'woo-demo-products'); ?></label>
+                        </th>
+                        <td>
+                            <select name="content_language" id="content_language">
+                                <?php
+                                $languages = array(
+                                    'en' => 'English',
+                                    'de' => 'Deutsch',
+                                    'es' => 'Español',
+                                    'fr' => 'Français',
+                                    'it' => 'Italiano',
+                                    'nl' => 'Nederlands',
+                                    'pl' => 'Polski',
+                                    'pt' => 'Português',
+                                    'ru' => 'Русский',
+                                    'zh' => '中文'
+                                );
+                                foreach ($languages as $code => $name) : ?>
+                                    <option value="<?php echo esc_attr($code); ?>">
+                                        <?php echo esc_html($name); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <p class="description">
+                                <?php echo esc_html__('Select the language for product descriptions', 'woo-demo-products'); ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
                             <label for="product_category"><?php echo esc_html__('Save Products in Category', 'woo-demo-products'); ?></label>
                         </th>
                         <td>
@@ -183,8 +213,9 @@ class WC_Demo_Products_Importer
             $count = isset($_POST['product_count']) ? intval($_POST['product_count']) : 1;
             $category_id = isset($_POST['product_category']) ? intval($_POST['product_category']) : 0;
             $generation_category = isset($_POST['generation_category']) ? sanitize_text_field($_POST['generation_category']) : '';
+            $language = isset($_POST['content_language']) ? sanitize_text_field($_POST['content_language']) : 'en';
 
-            $this->generate_and_import_products($count, $category_id, $generation_category);
+            $this->generate_and_import_products($count, $category_id, $generation_category, $language);
         }
     }
 
@@ -201,10 +232,13 @@ class WC_Demo_Products_Importer
             }
 
             // Prepare messages for API
-            $system_prompt = "You are a product data generator for an ecommerce store. You must respond with valid JSON only.";
+            $system_prompt = sprintf(
+                "You are a product data generator for an ecommerce store. Generate content in %s language. You must respond with valid JSON only.",
+                strtoupper($language)
+            );
 
             $user_prompt = sprintf(
-                'Generate %d realistic products for the category "%s". Return JSON in this exact format:
+                'Generate %d realistic products for the category "%s". All text should be in %s language. Return JSON in this exact format:
             {
                 "products": [
                     {
@@ -228,9 +262,9 @@ class WC_Demo_Products_Importer
                 ]
             }',
                 $count,
-                $category_name
+                $category_name,
+                strtoupper($language)
             );
-
 
             $response = wp_remote_post('https://api.openai.com/v1/chat/completions', array(
                 'timeout' => 60,
@@ -329,15 +363,17 @@ class WC_Demo_Products_Importer
         } catch (Exception $e) {
             // Log error for debugging
             error_log(sprintf(
-                '[WC Demo Products Importer] Error: %s, Category: %s, Count: %d',
+                '[WC Demo Products Importer] Error: %s, Category: %s, Count: %d, Language: %s',
                 $e->getMessage(),
-                $count
+                $category_name,
+                $count,
+                $language
             ));
 
             // Display error to user
             echo '<div class="error notice"><p>' .
-                esc_html__('Error: ', 'woo-demo-products') .
-                esc_html($e->getMessage()) .
+            esc_html__('Error: ', 'woo-demo-products') .
+            esc_html($e->getMessage()) .
                 '</p></div>';
             return false;
         }
