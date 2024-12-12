@@ -1,13 +1,15 @@
 # WooCommerce Demo Products Importer
 
-A WordPress plugin that uses OpenAI (GPT-4 & DALL-E 3) to generate demo products for your WooCommerce store. The plugin creates realistic product descriptions, features, and high-quality product images automatically.
+A WordPress plugin that uses OpenAI (GPT-4 & DALL-E 3) to generate demo products for your WooCommerce store. The plugin creates realistic product descriptions, features, and high-quality product images automatically in multiple languages.
 
 ## Features
 
 - 🤖 AI-powered product generation using GPT-4
 - 🖼️ Professional product images using DALL-E 3
 - 📦 Generate 1-25 products at once
-- 🏷️ 10 predefined product categories
+- 🌐 Support for 10 different languages
+- 🏷️ Use predefined product types
+- 📁 Save to any WooCommerce category
 - 🔄 Automatic SKU generation
 - 📝 Detailed product descriptions and features
 - 🏷️ Automatic tag generation
@@ -36,12 +38,28 @@ A WordPress plugin that uses OpenAI (GPT-4 & DALL-E 3) to generate demo products
 1. Navigate to WooCommerce > Import Demo Products
 2. Enter your OpenAI API key (if not already done)
 3. Select the number of products you want to generate (1-25)
-4. Choose a product category
-5. Click "Generate and Import Products"
-6. Wait for the products to be generated with their images
+4. Choose the type of products to generate (e.g., Electronics, Clothing)
+5. Select the WooCommerce category where products will be saved
+6. Choose your preferred content language
+7. Click "Generate and Import Products"
+8. Wait for the products to be generated with their images
 
-## Product Categories
+## Supported Languages
 
+- English (en)
+- German (de)
+- Spanish (es)
+- French (fr)
+- Italian (it)
+- Dutch (nl)
+- Polish (pl)
+- Portuguese (pt)
+- Russian (ru)
+- Chinese (zh)
+
+## Product Types
+
+Available product types for generation:
 - Electronics
 - Clothing
 - Books
@@ -85,7 +103,8 @@ Please note that using this plugin will consume your OpenAI API credits. Each pr
 For bug reports and feature requests, please use the GitHub issues page.
 
 ## Credits
-Tobias Lorsbach
+
+Developed by Tobias Lorsbach
 
 ## License
 
@@ -107,6 +126,12 @@ GPL v2 or later
 - Added support for sale prices
 - Improved image generation prompts
 - Enhanced error handling
+
+### 1.3.0
+- Added multi-language support (10 languages)
+- Separated product type selection from category selection
+- Improved category handling with WooCommerce integration
+- Enhanced error messages and validation
 
 ## Contributing
 
