@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Plugin Name: WooCommerce Demo Products Importer
  * Description: Imports AI-generated sample products into WooCommerce using OpenAI
@@ -7,35 +8,40 @@
  * Text Domain: woo-demo-products
  */
 
-// Prevent direct file access
+
 defined('ABSPATH') || exit;
 
-class WC_Demo_Products_Importer {
+class WC_Demo_Products_Importer
+{
     private $options;
     private $option_name = 'wc_demo_products_settings';
-    
-    public function __construct() {
+
+    public function __construct()
+    {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_init', array($this, 'check_woocommerce'));
         add_action('admin_init', array($this, 'register_settings'));
         $this->options = get_option($this->option_name);
     }
 
-    public function register_settings() {
+    public function register_settings()
+    {
         register_setting($this->option_name, $this->option_name);
     }
 
-    public function check_woocommerce() {
+    public function check_woocommerce()
+    {
         if (!class_exists('WooCommerce')) {
-            add_action('admin_notices', function() {
-                echo '<div class="error"><p>' . 
-                     esc_html__('WooCommerce Demo Products Importer requires WooCommerce to be installed and active.', 'woo-demo-products') . 
-                     '</p></div>';
+            add_action('admin_notices', function () {
+                echo '<div class="error"><p>' .
+                    esc_html__('WooCommerce Demo Products Importer requires WooCommerce to be installed and active.', 'woo-demo-products') .
+                    '</p></div>';
             });
         }
     }
 
-    public function add_admin_menu() {
+    public function add_admin_menu()
+    {
         add_submenu_page(
             'woocommerce',
             __('Import Demo Products', 'woo-demo-products'),
@@ -46,7 +52,8 @@ class WC_Demo_Products_Importer {
         );
     }
 
-    private function get_product_categories() {
+    private function get_product_categories()
+    {
         return array(
             'electronics' => 'Electronics',
             'clothing' => 'Clothing',
@@ -61,7 +68,8 @@ class WC_Demo_Products_Importer {
         );
     }
 
-    public function render_admin_page() {
+    public function render_admin_page()
+    {
         // Save API Key if posted
         if (isset($_POST['openai_api_key'])) {
             $options = get_option($this->option_name, array());
@@ -70,10 +78,10 @@ class WC_Demo_Products_Importer {
         }
 
         $saved_key = isset($this->options['openai_api_key']) ? $this->options['openai_api_key'] : '';
-        ?>
+?>
         <div class="wrap">
             <h1><?php echo esc_html__('Import Demo Products', 'woo-demo-products'); ?></h1>
-            
+
             <!-- API Key Settings -->
             <form method="post" action="">
                 <table class="form-table">
@@ -82,11 +90,11 @@ class WC_Demo_Products_Importer {
                             <label for="openai_api_key"><?php echo esc_html__('OpenAI API Key', 'woo-demo-products'); ?></label>
                         </th>
                         <td>
-                            <input type="text" 
-                                   id="openai_api_key" 
-                                   name="openai_api_key" 
-                                   value="<?php echo esc_attr($saved_key); ?>" 
-                                   class="regular-text">
+                            <input type="text"
+                                id="openai_api_key"
+                                name="openai_api_key"
+                                value="<?php echo esc_attr($saved_key); ?>"
+                                class="regular-text">
                             <p class="description">
                                 <?php echo esc_html__('Enter your OpenAI API key to enable AI-generated product data.', 'woo-demo-products'); ?>
                             </p>
@@ -99,7 +107,7 @@ class WC_Demo_Products_Importer {
             <!-- Import Products Form -->
             <form method="post" action="">
                 <?php wp_nonce_field('import_demo_products', 'demo_products_nonce'); ?>
-                
+
                 <table class="form-table">
                     <tr>
                         <th scope="row">
@@ -134,7 +142,7 @@ class WC_Demo_Products_Importer {
                 </p>
             </form>
         </div>
-        <?php
+<?php
 
         if (isset($_POST['import_demo_products']) && check_admin_referer('import_demo_products', 'demo_products_nonce')) {
             $this->generate_and_import_products(
@@ -144,7 +152,8 @@ class WC_Demo_Products_Importer {
         }
     }
 
-   private function call_openai_api($count, $category) {
+    private function call_openai_api($count, $category)
+    {
         try {
             if (empty($this->options['openai_api_key'])) {
                 throw new Exception('OpenAI API key is missing. Please enter your API key in the settings.');
@@ -161,21 +170,31 @@ class WC_Demo_Products_Importer {
 
             // Prepare messages for API
             $system_prompt = "You are a product data generator for an ecommerce store. You must respond with valid JSON only.";
-            
+
             $user_prompt = sprintf(
                 'Generate %d realistic products for the category "%s". Return JSON in this exact format:
-                {
-                    "products": [
-                        {
-                            "name": "Product Name",
-                            "price": "29.99",
-                            "short_description": "Brief product description",
-                            "long_description": "Detailed product description",
-                            "features": ["feature1", "feature2"],
-                            "tags": ["tag1", "tag2"]
-                        }
-                    ]
-                }',
+    {
+        "products": [
+            {
+                "name": "Product Name",
+                "sku": "UNIQUE-SKU-123",
+                "price": "29.99",
+                "sale_price": "24.99",
+                "stock_quantity": 100,
+                "stock_status": "instock",
+                "weight": "1.5",
+                "dimensions": {
+                    "length": "10",
+                    "width": "5",
+                    "height": "2"
+                },
+                "short_description": "Brief product description",
+                "long_description": "Detailed product description",
+                "features": ["feature1", "feature2"],
+                "tags": ["tag1", "tag2"]
+            }
+        ]
+    }',
                 $count,
                 $this->get_product_categories()[$category]
             );
@@ -228,7 +247,8 @@ class WC_Demo_Products_Importer {
             // Check for model refusal
             if (isset($body['choices'][0]['message']['refusal'])) {
                 throw new Exception(
-                    sprintf('Model refused to generate: %s', 
+                    sprintf(
+                        'Model refused to generate: %s',
                         $body['choices'][0]['message']['refusal']
                     )
                 );
@@ -245,8 +265,10 @@ class WC_Demo_Products_Importer {
             }
 
             // Validate response structure
-            if (empty($body['choices']) || 
-                !isset($body['choices'][0]['message']['content'])) {
+            if (
+                empty($body['choices']) ||
+                !isset($body['choices'][0]['message']['content'])
+            ) {
                 throw new Exception('Invalid response structure from OpenAI API.');
             }
 
@@ -256,7 +278,8 @@ class WC_Demo_Products_Importer {
 
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new Exception(
-                    sprintf('JSON parsing error: %s. Content received: %s', 
+                    sprintf(
+                        'JSON parsing error: %s. Content received: %s',
                         json_last_error_msg(),
                         substr($content, 0, 255)
                     )
@@ -270,29 +293,29 @@ class WC_Demo_Products_Importer {
 
             // Return only the products array
             return $products_data['products'];
-
         } catch (Exception $e) {
             // Log error for debugging
             error_log(sprintf(
-                '[WC Demo Products Importer] Error: %s, Category: %s, Count: %d', 
-                $e->getMessage(), 
-                $category, 
+                '[WC Demo Products Importer] Error: %s, Category: %s, Count: %d',
+                $e->getMessage(),
+                $category,
                 $count
             ));
 
             // Display error to user
-            echo '<div class="error notice"><p>' . 
-                 esc_html__('Error: ', 'woo-demo-products') . 
-                 esc_html($e->getMessage()) . 
-                 '</p></div>';
+            echo '<div class="error notice"><p>' .
+                esc_html__('Error: ', 'woo-demo-products') .
+                esc_html($e->getMessage()) .
+                '</p></div>';
             return false;
         }
     }
-
-    private function generate_and_import_products($count, $category) {
+    /** @deprecated */
+    private function generate_and_import_products_($count, $category)
+    {
         // Call OpenAI API with error handling
         $products_data = $this->call_openai_api($count, $category);
-        
+
         if (!$products_data) {
             return; // Error already displayed
         }
@@ -304,10 +327,57 @@ class WC_Demo_Products_Importer {
             foreach ($products_data as $product_data) {
                 // Create product
                 $product = new WC_Product_Simple();
-                
+
                 // Set product data
                 $product->set_name($product_data['name']);
+
+                // Set SKU (with validation)
+                if (!empty($product_data['sku'])) {
+                    // Make sure SKU is unique
+                    $existing_product_id = wc_get_product_id_by_sku($product_data['sku']);
+                    if (!$existing_product_id) {
+                        $product->set_sku($product_data['sku']);
+                    } else {
+                        // Append random string to make SKU unique
+                        $product->set_sku($product_data['sku'] . '-' . substr(uniqid(), -4));
+                    }
+                }
+
+                // Set prices
                 $product->set_regular_price($product_data['price']);
+                if (!empty($product_data['sale_price'])) {
+                    $product->set_sale_price($product_data['sale_price']);
+                }
+
+                // Set stock
+                if (isset($product_data['stock_quantity'])) {
+                    $product->set_stock_quantity($product_data['stock_quantity']);
+                    $product->set_manage_stock(true);
+                }
+
+                if (!empty($product_data['stock_status'])) {
+                    $product->set_stock_status($product_data['stock_status']); // 'instock', 'outofstock', 'onbackorder'
+                }
+
+                // Set dimensions
+                if (!empty($product_data['dimensions'])) {
+                    if (isset($product_data['dimensions']['length'])) {
+                        $product->set_length($product_data['dimensions']['length']);
+                    }
+                    if (isset($product_data['dimensions']['width'])) {
+                        $product->set_width($product_data['dimensions']['width']);
+                    }
+                    if (isset($product_data['dimensions']['height'])) {
+                        $product->set_height($product_data['dimensions']['height']);
+                    }
+                }
+
+                // Set weight
+                if (!empty($product_data['weight'])) {
+                    $product->set_weight($product_data['weight']);
+                }
+
+                // Set descriptions
                 $product->set_description($product_data['long_description']);
                 $product->set_short_description($product_data['short_description']);
 
@@ -352,24 +422,176 @@ class WC_Demo_Products_Importer {
                 $imported_count++;
             }
 
-            echo '<div class="notice notice-success"><p>' . 
-                 sprintf(
-                     esc_html__('Successfully imported %d AI-generated products.', 'woo-demo-products'), 
-                     $imported_count
-                 ) . 
-                 '</p></div>';
-
+            echo '<div class="notice notice-success"><p>' .
+                sprintf(
+                    esc_html__('Successfully imported %d AI-generated products.', 'woo-demo-products'),
+                    $imported_count
+                ) .
+                '</p></div>';
         } catch (Exception $e) {
-            echo '<div class="error notice"><p>' . 
-                 sprintf(
-                     esc_html__('Error during product import: %s', 'woo-demo-products'),
-                     esc_html($e->getMessage())
-                 ) . 
-                 '</p></div>';
+            echo '<div class="error notice"><p>' .
+                sprintf(
+                    esc_html__('Error during product import: %s', 'woo-demo-products'),
+                    esc_html($e->getMessage())
+                ) .
+                '</p></div>';
         }
     }
 
-    private function set_product_images($product_id, $image_urls) {
+
+    private function generate_product_image($product_name, $product_description, $category)
+    {
+        try {
+            if (empty($this->options['openai_api_key'])) {
+                throw new Exception('OpenAI API key is missing.');
+            }
+
+            // Create prompt for DALL-E
+            $prompt = sprintf(
+                'A professional product photo of %s. %s. Style: Professional e-commerce white background photography, high resolution, product-focused.',
+                $product_name,
+                $product_description
+            );
+
+            // Call DALL-E API
+            $response = wp_remote_post('https://api.openai.com/v1/images/generations', array(
+                'timeout' => 60,
+                'headers' => array(
+                    'Authorization' => 'Bearer ' . $this->options['openai_api_key'],
+                    'Content-Type' => 'application/json',
+                ),
+                'body' => json_encode(array(
+                    'model' => 'dall-e-3',
+                    'prompt' => $prompt,
+                    'n' => 1,
+                    'size' => '1024x1024',
+                    'quality' => 'hd',
+                    'response_format' => 'url'
+                ))
+            ));
+
+            if (is_wp_error($response)) {
+                throw new Exception('Failed to generate image: ' . $response->get_error_message());
+            }
+
+            $response_code = wp_remote_retrieve_response_code($response);
+            $response_body = json_decode(wp_remote_retrieve_body($response), true);
+
+            if ($response_code !== 200) {
+                $error_message = isset($response_body['error']['message']) ? $response_body['error']['message'] : 'Unknown error';
+                throw new Exception('DALL-E API Error: ' . $error_message);
+            }
+
+            if (empty($response_body['data'][0]['url'])) {
+                throw new Exception('No image URL in response');
+            }
+
+            return $response_body['data'][0]['url'];
+        } catch (Exception $e) {
+            error_log('Image generation error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function download_and_attach_image($image_url, $product_id, $product_name)
+    {
+        require_once(ABSPATH . 'wp-admin/includes/media.php');
+        require_once(ABSPATH . 'wp-admin/includes/file.php');
+        require_once(ABSPATH . 'wp-admin/includes/image.php');
+
+        try {
+            // Download image
+            $tmp = download_url($image_url);
+            if (is_wp_error($tmp)) {
+                throw new Exception('Failed to download image: ' . $tmp->get_error_message());
+            }
+
+            // Prepare file array
+            $file_array = array(
+                'name' => sanitize_file_name($product_name . '-' . uniqid() . '.jpg'),
+                'tmp_name' => $tmp
+            );
+
+            // Add image to media library and attach to product
+            $image_id = media_handle_sideload($file_array, $product_id);
+
+            if (is_wp_error($image_id)) {
+                @unlink($tmp); // Clean up
+                throw new Exception('Failed to add image to library: ' . $image_id->get_error_message());
+            }
+
+            // Set as product thumbnail
+            set_post_thumbnail($product_id, $image_id);
+
+            return true;
+        } catch (Exception $e) {
+            error_log('Image attachment error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    // Modify the generate_and_import_products method to use AI images
+    private function generate_and_import_products($count, $category)
+    {
+        $products_data = $this->call_openai_api($count, $category);
+
+        if (!$products_data) {
+            return;
+        }
+
+        $imported_count = 0;
+        $image_success_count = 0;
+
+        try {
+            foreach ($products_data as $product_data) {
+                // Create product
+                $product = new WC_Product_Simple();
+
+                // Set product data
+                $product->set_name($product_data['name']);
+                // ... [rest of your product data setting code]
+
+                // Save product first to get ID
+                $product_id = $product->save();
+                if (!$product_id) {
+                    throw new Exception('Failed to save product: ' . $product_data['name']);
+                }
+
+                // Generate and attach AI image
+                $image_url = $this->generate_product_image(
+                    $product_data['name'],
+                    $product_data['short_description'],
+                    $category
+                );
+
+                if ($image_url) {
+                    if ($this->download_and_attach_image($image_url, $product_id, $product_data['name'])) {
+                        $image_success_count++;
+                    }
+                }
+
+                $imported_count++;
+            }
+
+            echo '<div class="notice notice-success"><p>' .
+            sprintf(
+                esc_html__('Successfully imported %d products with %d AI-generated images.', 'woo-demo-products'),
+                $imported_count,
+                $image_success_count
+            ) .
+                '</p></div>';
+        } catch (Exception $e) {
+            echo '<div class="error notice"><p>' .
+            sprintf(
+                esc_html__('Error during product import: %s', 'woo-demo-products'),
+                esc_html($e->getMessage())
+            ) .
+                '</p></div>';
+        }
+    }
+
+    private function set_product_images($product_id, $image_urls)
+    {
         require_once(ABSPATH . 'wp-admin/includes/media.php');
         require_once(ABSPATH . 'wp-admin/includes/file.php');
         require_once(ABSPATH . 'wp-admin/includes/image.php');
