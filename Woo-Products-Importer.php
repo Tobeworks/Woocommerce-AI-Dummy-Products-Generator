@@ -310,6 +310,7 @@ class WC_Demo_Products_Importer
             return false;
         }
     }
+
     /** @deprecated */
     private function generate_and_import_products_($count, $category)
     {
@@ -549,7 +550,85 @@ class WC_Demo_Products_Importer
 
                 // Set product data
                 $product->set_name($product_data['name']);
-                // ... [rest of your product data setting code]
+
+                // Set SKU (with validation)
+                if (!empty($product_data['sku'])) {
+                    // Make sure SKU is unique
+                    $existing_product_id = wc_get_product_id_by_sku($product_data['sku']);
+                    if (!$existing_product_id) {
+                        $product->set_sku($product_data['sku']);
+                    } else {
+                        // Append random string to make SKU unique
+                        $product->set_sku($product_data['sku'] . '-' . substr(uniqid(), -4));
+                    }
+                }
+
+                // Set prices
+                $product->set_regular_price($product_data['price']);
+                if (!empty($product_data['sale_price'])) {
+                    $product->set_sale_price($product_data['sale_price']);
+                }
+
+                // Set stock
+                if (isset($product_data['stock_quantity'])) {
+                    $product->set_stock_quantity($product_data['stock_quantity']);
+                    $product->set_manage_stock(true);
+                }
+
+                if (!empty($product_data['stock_status'])) {
+                    $product->set_stock_status($product_data['stock_status']); // 'instock', 'outofstock', 'onbackorder'
+                }
+
+                // Set dimensions
+                if (!empty($product_data['dimensions'])) {
+                    if (isset($product_data['dimensions']['length'])) {
+                        $product->set_length($product_data['dimensions']['length']);
+                    }
+                    if (isset($product_data['dimensions']['width'])) {
+                        $product->set_width($product_data['dimensions']['width']);
+                    }
+                    if (isset($product_data['dimensions']['height'])) {
+                        $product->set_height($product_data['dimensions']['height']);
+                    }
+                }
+
+                // Set weight
+                if (!empty($product_data['weight'])) {
+                    $product->set_weight($product_data['weight']);
+                }
+
+                // Set descriptions
+                $product->set_description($product_data['long_description']);
+                $product->set_short_description($product_data['short_description']);
+
+                // Set category
+                $term = get_term_by('slug', $category, 'product_cat');
+                if (!$term) {
+                    $term = wp_insert_term(
+                        $this->get_product_categories()[$category],
+                        'product_cat',
+                        array('slug' => $category)
+                    );
+                    if (is_wp_error($term)) {
+                        throw new Exception('Failed to create product category: ' . $term->get_error_message());
+                    }
+                    $product->set_category_ids(array($term['term_id']));
+                } else {
+                    $product->set_category_ids(array($term->term_id));
+                }
+
+                // Add features as product meta
+                if (!empty($product_data['features'])) {
+                    update_post_meta($product->get_id(), '_product_features', $product_data['features']);
+                }
+
+                // Set tags
+                if (!empty($product_data['tags'])) {
+                    $tag_result = wp_set_object_terms($product->get_id(), $product_data['tags'], 'product_tag');
+                    if (is_wp_error($tag_result)) {
+                        throw new Exception('Failed to set product tags: ' . $tag_result->get_error_message());
+                    }
+                }
 
                 // Save product first to get ID
                 $product_id = $product->save();
@@ -574,18 +653,18 @@ class WC_Demo_Products_Importer
             }
 
             echo '<div class="notice notice-success"><p>' .
-            sprintf(
-                esc_html__('Successfully imported %d products with %d AI-generated images.', 'woo-demo-products'),
-                $imported_count,
-                $image_success_count
-            ) .
+                sprintf(
+                    esc_html__('Successfully imported %d products with %d AI-generated images.', 'woo-demo-products'),
+                    $imported_count,
+                    $image_success_count
+                ) .
                 '</p></div>';
         } catch (Exception $e) {
             echo '<div class="error notice"><p>' .
-            sprintf(
-                esc_html__('Error during product import: %s', 'woo-demo-products'),
-                esc_html($e->getMessage())
-            ) .
+                sprintf(
+                    esc_html__('Error during product import: %s', 'woo-demo-products'),
+                    esc_html($e->getMessage())
+                ) .
                 '</p></div>';
         }
     }
