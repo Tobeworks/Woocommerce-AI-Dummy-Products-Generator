@@ -3,7 +3,6 @@
 A WordPress plugin that uses OpenAI (GPT-4 & DALL-E 3) to generate demo products for your WooCommerce store. The plugin creates realistic product descriptions, features, and high-quality product images automatically in multiple languages.
 
 ## Features
-
 - 🤖 AI-powered product generation using GPT-4
 - 🖼️ Professional product images using DALL-E 3
 - 📦 Generate 1-25 products at once
@@ -18,34 +17,29 @@ A WordPress plugin that uses OpenAI (GPT-4 & DALL-E 3) to generate demo products
 - 💰 Regular and sale prices
 
 ## Requirements
-
 - WordPress 5.0 or higher
 - WooCommerce 6.0 or higher
 - PHP 7.4 or higher
 - OpenAI API key
 
 ## Installation
-
 1. Download the plugin zip file
 2. Go to WordPress Admin > Plugins > Add New
 3. Click "Upload Plugin" and choose the downloaded file
 4. Activate the plugin
 5. Go to WooCommerce > Import Demo Products
-6. Enter your OpenAI API key and save
 
 ## Usage
-
 1. Navigate to WooCommerce > Import Demo Products
-2. Enter your OpenAI API key (if not already done)
-3. Select the number of products you want to generate (1-25)
-4. Choose the type of products to generate (e.g., Electronics, Clothing)
-5. Select the WooCommerce category where products will be saved
-6. Choose your preferred content language
-7. Click "Generate and Import Products"
+2. Select the number of products you want to generate (1-25)
+3. Choose the type of products to generate (e.g., Electronics, Clothing)
+4. Select the WooCommerce category where products will be saved
+5. Choose your preferred content language
+6. Go to the Settings tab to enter your OpenAI API key (if not already done)
+7. Return to the Import tab and click "Generate and Import Products"
 8. Wait for the products to be generated with their images
 
 ## Supported Languages
-
 - English (en)
 - German (de)
 - Spanish (es)
@@ -58,7 +52,6 @@ A WordPress plugin that uses OpenAI (GPT-4 & DALL-E 3) to generate demo products
 - Chinese (zh)
 
 ## Product Types
-
 Available product types for generation:
 - Electronics
 - Clothing
@@ -72,7 +65,6 @@ Available product types for generation:
 - Art & Crafts
 
 ## Generated Product Data
-
 Each product includes:
 - Product name
 - SKU
@@ -89,9 +81,8 @@ Each product includes:
 - Professional product image
 
 ## API Usage
-
 The plugin uses two OpenAI APIs:
-- GPT-4 for product data generation
+- GPT-4 Turbo for product data generation
 - DALL-E 3 for image generation
 
 Please note that using this plugin will consume your OpenAI API credits. Each product generation uses:
@@ -99,33 +90,27 @@ Please note that using this plugin will consume your OpenAI API credits. Each pr
 - One DALL-E 3 API call for the product image
 
 ## Support
-
 For bug reports and feature requests, please use the GitHub issues page.
 
 ## Credits
-
 Developed by Tobias Lorsbach
 
 ## License
-
 GPL v2 or later
 
 ## Changelog
 
-### 1.0.0
-- Initial release
-- Product generation with GPT-4
-- Image generation with DALL-E 3
-
-### 1.1.0
-- Added support for product dimensions
-- Added support for stock management
-- Added SKU generation
-
-### 1.2.0
-- Added support for sale prices
-- Improved image generation prompts
-- Enhanced error handling
+### 2.0.0
+- Complete plugin restructure with separate tabs for better organization
+- Improved UI with dedicated Import and Settings sections
+- Enhanced error handling and validation
+- Added progress indicators for generation process
+- Updated to GPT-4 Turbo for better product descriptions
+- Improved DALL-E 3 prompts for better image quality
+- Better category handling and validation
+- Enhanced security measures
+- Added detailed error logging
+- Improved multilingual support
 
 ### 1.3.0
 - Added multi-language support (10 languages)
@@ -133,6 +118,20 @@ GPL v2 or later
 - Improved category handling with WooCommerce integration
 - Enhanced error messages and validation
 
-## Contributing
+### 1.2.0
+- Added support for sale prices
+- Improved image generation prompts
+- Enhanced error handling
 
+### 1.1.0
+- Added support for product dimensions
+- Added support for stock management
+- Added SKU generation
+
+### 1.0.0
+- Initial release
+- Product generation with GPT-4
+- Image generation with DALL-E 3
+
+## Contributing
 Contributions are welcome! Please feel free to submit a Pull Request.
