@@ -48,7 +48,7 @@ class WC_Demo_Products_Import_Tab
     {
         if (empty($this->options['openai_api_key'])) {
             echo '<div class="notice notice-warning"><p>' .
-                esc_html__('Please enter your OpenAI API key in the Settings tab before importing products.', 'woo-demo-products') .
+                esc_html__('Please enter your OpenAI API key in the Settings tab before importing products.', 'woo-ai-dummy-products') .
                 '</p></div>';
             return;
         }
@@ -58,7 +58,7 @@ class WC_Demo_Products_Import_Tab
             <table class="form-table">
                 <tr>
                     <th scope="row">
-                        <label for="product_count"><?php echo esc_html__('Number of Products', 'woo-demo-products'); ?></label>
+                        <label for="product_count"><?php echo esc_html__('Number of Products', 'woo-ai-dummy-products'); ?></label>
                     </th>
                     <td>
                         <select name="product_count" id="product_count">
@@ -67,14 +67,14 @@ class WC_Demo_Products_Import_Tab
                             <?php endfor; ?>
                         </select>
                         <p class="description">
-                            <?php echo esc_html__('Select how many products to generate', 'woo-demo-products'); ?>
+                            <?php echo esc_html__('Select how many products to generate', 'woo-ai-dummy-products'); ?>
                         </p>
                     </td>
                 </tr>
 
                 <tr>
                     <th scope="row">
-                        <label for="generation_category"><?php echo esc_html__('Generate Products Type', 'woo-demo-products'); ?></label>
+                        <label for="generation_category"><?php echo esc_html__('Generate Products Type', 'woo-ai-dummy-products'); ?></label>
                     </th>
                     <td>
                         <select name="generation_category" id="generation_category">
@@ -89,14 +89,14 @@ class WC_Demo_Products_Import_Tab
                             ?>
                         </select>
                         <p class="description">
-                            <?php echo esc_html__('Select the type of products to generate', 'woo-demo-products'); ?>
+                            <?php echo esc_html__('Select the type of products to generate', 'woo-ai-dummy-products'); ?>
                         </p>
                     </td>
                 </tr>
 
                 <tr>
                     <th scope="row">
-                        <label for="content_language"><?php echo esc_html__('Content Language', 'woo-demo-products'); ?></label>
+                        <label for="content_language"><?php echo esc_html__('Content Language', 'woo-ai-dummy-products'); ?></label>
                     </th>
                     <td>
                         <select name="content_language" id="content_language">
@@ -111,14 +111,14 @@ class WC_Demo_Products_Import_Tab
                             ?>
                         </select>
                         <p class="description">
-                            <?php echo esc_html__('Select the language for product descriptions', 'woo-demo-products'); ?>
+                            <?php echo esc_html__('Select the language for product descriptions', 'woo-ai-dummy-products'); ?>
                         </p>
                     </td>
                 </tr>
 
                 <tr>
                     <th scope="row">
-                        <label for="product_category"><?php echo esc_html__('Save Products in Category', 'woo-demo-products'); ?></label>
+                        <label for="product_category"><?php echo esc_html__('Save Products in Category', 'woo-ai-dummy-products'); ?></label>
                     </th>
                     <td>
                         <select name="product_category" id="product_category">
@@ -140,7 +140,7 @@ class WC_Demo_Products_Import_Tab
                             ?>
                         </select>
                         <p class="description">
-                            <?php echo esc_html__('Select the WooCommerce category where products will be saved', 'woo-demo-products'); ?>
+                            <?php echo esc_html__('Select the WooCommerce category where products will be saved', 'woo-ai-dummy-products'); ?>
                         </p>
                     </td>
                 </tr>
@@ -148,7 +148,7 @@ class WC_Demo_Products_Import_Tab
 
             <div class="wc-demo-products-actions">
                 <button type="submit" name="import_demo_products" class="button button-primary">
-                    <?php echo esc_html__('Generate and Import Products', 'woo-demo-products'); ?>
+                    <?php echo esc_html__('Generate and Import Products', 'woo-ai-dummy-products'); ?>
                 </button>
 
                 <span class="spinner"></span>
@@ -196,7 +196,7 @@ class WC_Demo_Products_Import_Tab
     {
         $count = isset($_POST['product_count']) ? intval($_POST['product_count']) : 0;
         if ($count < 1 || $count > 25) {
-            throw new Exception(__('Invalid number of products selected.', 'woo-demo-products'));
+            throw new Exception(__('Invalid number of products selected.', 'woo-ai-dummy-products'));
         }
         return $count;
     }
@@ -205,7 +205,7 @@ class WC_Demo_Products_Import_Tab
     {
         $category_id = isset($_POST['product_category']) ? intval($_POST['product_category']) : 0;
         if (!term_exists($category_id, 'product_cat')) {
-            throw new Exception(__('Selected category does not exist.', 'woo-demo-products'));
+            throw new Exception(__('Selected category does not exist.', 'woo-ai-dummy-products'));
         }
         return $category_id;
     }
@@ -214,7 +214,7 @@ class WC_Demo_Products_Import_Tab
     {
         $category = isset($_POST['generation_category']) ? sanitize_text_field($_POST['generation_category']) : '';
         if (!array_key_exists($category, $this->get_product_categories())) {
-            throw new Exception(__('Invalid generation category selected.', 'woo-demo-products'));
+            throw new Exception(__('Invalid generation category selected.', 'woo-ai-dummy-products'));
         }
         return $category;
     }
@@ -223,7 +223,7 @@ class WC_Demo_Products_Import_Tab
     {
         $language = isset($_POST['content_language']) ? sanitize_text_field($_POST['content_language']) : '';
         if (!array_key_exists($language, $this->get_languages())) {
-            throw new Exception(__('Invalid language selected.', 'woo-demo-products'));
+            throw new Exception(__('Invalid language selected.', 'woo-ai-dummy-products'));
         }
         return $language;
     }
@@ -232,7 +232,7 @@ class WC_Demo_Products_Import_Tab
     {
         echo '<div class="notice notice-success"><p>' .
             sprintf(
-                esc_html__('Successfully imported %d products with %d AI-generated images.', 'woo-demo-products'),
+                esc_html__('Successfully imported %d products with %d AI-generated images.', 'woo-ai-dummy-products'),
                 $imported_count,
                 $image_count
             ) .
@@ -243,7 +243,7 @@ class WC_Demo_Products_Import_Tab
     {
         echo '<div class="error notice"><p>' .
             sprintf(
-                esc_html__('Error during product import: %s', 'woo-demo-products'),
+                esc_html__('Error during product import: %s', 'woo-ai-dummy-products'),
                 esc_html($message)
             ) .
             '</p></div>';

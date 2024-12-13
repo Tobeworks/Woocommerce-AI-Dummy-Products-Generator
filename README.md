@@ -1,6 +1,6 @@
-# WooCommerce Demo Products Importer
+# WooCommerce AI Dummy Products Importer
 
-A WordPress plugin that uses OpenAI (GPT-4 & DALL-E 3) to generate demo products for your WooCommerce store. The plugin creates realistic product descriptions, features, and high-quality product images automatically in multiple languages.
+A WordPress plugin that uses OpenAI (GPT & DALL-E) to generate demo products for your WooCommerce store. The plugin creates realistic product descriptions, features, and high-quality product images automatically in multiple languages.
 
 ## Features
 - 🤖 AI-powered product generation using GPT-4
@@ -27,10 +27,10 @@ A WordPress plugin that uses OpenAI (GPT-4 & DALL-E 3) to generate demo products
 2. Go to WordPress Admin > Plugins > Add New
 3. Click "Upload Plugin" and choose the downloaded file
 4. Activate the plugin
-5. Go to WooCommerce > Import Demo Products
+5. Go to WooCommerce > Import Dummy Products
 
 ## Usage
-1. Navigate to WooCommerce > Import Demo Products
+1. Navigate to WooCommerce > Import Dummy Products
 2. Select the number of products you want to generate (1-25)
 3. Choose the type of products to generate (e.g., Electronics, Clothing)
 4. Select the WooCommerce category where products will be saved
@@ -99,6 +99,9 @@ Developed by Tobias Lorsbach
 GPL v2 or later
 
 ## Changelog
+
+### 2.1.0
+- Name change
 
 ### 2.0.0
 - Complete plugin restructure with separate tabs for better organization

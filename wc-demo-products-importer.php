@@ -3,9 +3,9 @@
 /**
  * Plugin Name: WooCommerce Demo Products Importer
  * Description: Imports AI-generated sample products into WooCommerce using OpenAI
- * Version: 2.0
+ * Version: 2.1
  * Author: Tobias Lorsbach
- * Text Domain: woo-demo-products
+ * Text Domain: woo-ai-dummy-products
  */
 
 defined('ABSPATH') || exit;
@@ -35,7 +35,7 @@ class WC_Demo_Products_Importer
         if (!class_exists('WooCommerce')) {
             add_action('admin_notices', function () {
                 echo '<div class="error"><p>' .
-                    esc_html__('WooCommerce Demo Products Importer requires WooCommerce to be installed and active.', 'woo-demo-products') .
+                    esc_html__('WooCommerce Demo Products Importer requires WooCommerce to be installed and active.', 'woo-ai-dummy-products') .
                     '</p></div>';
             });
         }
@@ -45,8 +45,8 @@ class WC_Demo_Products_Importer
     {
         $page = add_submenu_page(
             'woocommerce',
-            __('Import Demo Products', 'woo-demo-products'),
-            __('Import Demo Products', 'woo-demo-products'),
+            __('Import Dummy Products', 'woo-ai-dummy-products'),
+            __('Import Dummy Products', 'woo-ai-dummy-products'),
             'manage_woocommerce',
             'wc-demo-products',
             array($this, 'render_admin_page')
@@ -75,16 +75,16 @@ class WC_Demo_Products_Importer
         $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'import';
 ?>
         <div class="wrap">
-            <h1><?php echo esc_html__('Import Demo Products', 'woo-demo-products'); ?></h1>
+            <h1><?php echo esc_html__('Import Dummy Products', 'woo-ai-dummy-products'); ?></h1>
 
             <nav class="nav-tab-wrapper">
                 <a href="?page=wc-demo-products&tab=import"
                     class="nav-tab <?php echo $active_tab === 'import' ? 'nav-tab-active' : ''; ?>">
-                    <?php esc_html_e('Import Products', 'woo-demo-products'); ?>
+                    <?php esc_html_e('Import Products', 'woo-ai-dummy-products'); ?>
                 </a>
                 <a href="?page=wc-demo-products&tab=settings"
                     class="nav-tab <?php echo $active_tab === 'settings' ? 'nav-tab-active' : ''; ?>">
-                    <?php esc_html_e('Settings', 'woo-demo-products'); ?>
+                    <?php esc_html_e('Settings', 'woo-ai-dummy-products'); ?>
                 </a>
             </nav>
 
@@ -95,7 +95,7 @@ class WC_Demo_Products_Importer
                 if (empty($options['openai_api_key'])) {
                     echo '<div class="notice notice-warning"><p>' .
                         sprintf(
-                            __('Please add your OpenAI API key in the %1$sSettings tab%2$s before importing products.', 'woo-demo-products'),
+                            __('Please add your OpenAI API key in the %1$sSettings tab%2$s before importing products.', 'woo-ai-dummy-products'),
                             '<a href="?page=wc-demo-products&tab=settings">',
                             '</a>'
                         ) .

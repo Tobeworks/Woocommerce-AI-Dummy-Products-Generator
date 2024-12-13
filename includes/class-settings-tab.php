@@ -32,7 +32,7 @@ class WC_Demo_Products_Settings_Tab
             <table class="form-table">
                 <tr>
                     <th scope="row">
-                        <label for="openai_api_key"><?php echo esc_html__('OpenAI API Key', 'woo-demo-products'); ?></label>
+                        <label for="openai_api_key"><?php echo esc_html__('OpenAI API Key', 'woo-ai-dummy-products'); ?></label>
                     </th>
                     <td>
                         <input type="text"
@@ -41,12 +41,12 @@ class WC_Demo_Products_Settings_Tab
                             value="<?php echo esc_attr($saved_key); ?>"
                             class="regular-text">
                         <p class="description">
-                            <?php echo esc_html__('Enter your OpenAI API key to enable AI-generated product data.', 'woo-demo-products'); ?>
+                            <?php echo esc_html__('Enter your OpenAI API key to enable AI-generated product data.', 'woo-ai-dummy-products'); ?>
                         </p>
                     </td>
                 </tr>
             </table>
-            <?php submit_button(__('Save API Key', 'woo-demo-products')); ?>
+            <?php submit_button(__('Save API Key', 'woo-ai-dummy-products')); ?>
         </form>
 <?php
     }
