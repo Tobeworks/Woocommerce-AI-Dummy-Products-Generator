@@ -7,18 +7,12 @@ class WC_Demo_Products_OpenAI_Handler
     public function __construct($options)
     {
         $this->options = $options;
-        $this->generation_categories = array(
-            'electronics' => 'Electronics',
-            'clothing' => 'Clothing',
-            'books' => 'Books',
-            'home-garden' => 'Home & Garden',
-            'sports' => 'Sports & Outdoors',
-            'beauty' => 'Beauty & Personal Care',
-            'toys' => 'Toys & Games',
-            'food' => 'Food & Beverages',
-            'jewelry' => 'Jewelry',
-            'art' => 'Art & Crafts'
-        );
+        $this->generation_categories =  $this->get_product_categories();
+    }
+
+    private function get_product_categories()
+    {
+        return include(plugin_dir_path(dirname(__FILE__)) . 'includes/config/categories.php');
     }
 
     public function generate_and_import_products($count, $category_id, $generation_category, $language = 'en')

@@ -14,18 +14,7 @@ class WC_Demo_Products_Import_Tab
 
     private function get_product_categories()
     {
-        return array(
-            'electronics' => 'Electronics',
-            'clothing' => 'Clothing',
-            'books' => 'Books',
-            'home-garden' => 'Home & Garden',
-            'sports' => 'Sports & Outdoors',
-            'beauty' => 'Beauty & Personal Care',
-            'toys' => 'Toys & Games',
-            'food' => 'Food & Beverages',
-            'jewelry' => 'Jewelry',
-            'art' => 'Art & Crafts'
-        );
+        return include(plugin_dir_path(dirname(__FILE__)) . 'includes/config/categories.php');
     }
 
     private function get_languages()
