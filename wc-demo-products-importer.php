@@ -3,7 +3,7 @@
 /**
  * Plugin Name: WooCommerce Demo Products Importer
  * Description: Imports AI-generated sample products into WooCommerce using OpenAI
- * Version: 2.1
+ * Version: 2.1.1
  * Author: Tobias Lorsbach
  * Text Domain: woo-ai-dummy-products
  */

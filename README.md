@@ -100,6 +100,9 @@ GPL v2 or later
 
 ## Changelog
 
+### 2.1.1
+- Moved product_categories in one file (config/categories.php)
+
 ### 2.1.0
 - Name change
 
