@@ -19,4 +19,3 @@ return array(
     'pets' => 'Pet Supplies',
     'office' => 'Office Products'
 );
-

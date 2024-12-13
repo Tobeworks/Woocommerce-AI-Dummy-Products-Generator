@@ -100,6 +100,10 @@ GPL v2 or later
 
 ## Changelog
 
+### 2.1.2
+- Dynamic product categories added
+- number of products increased to 50
+
 ### 2.1.1
 - Moved product_categories in one file (config/categories.php)
 

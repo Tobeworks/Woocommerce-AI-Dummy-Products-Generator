@@ -1,0 +1,40 @@
+/* File: assets/css/settings.css */
+#product-categories {
+    margin: 20px 0;
+}
+
+.category-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.category-item input[type="text"] {
+    width: 200px;
+    padding: 5px 8px;
+}
+
+.category-item input[disabled] {
+    background: #f0f0f0;
+    border-color: #ddd;
+}
+
+.remove-category {
+    color: #dc3232;
+}
+
+.add-category {
+    margin-top: 10px;
+}
+
+/* Ensure proper spacing in form table */
+.form-table td {
+    padding-bottom: 15px;
+}
+
+/* Style for disabled remove buttons */
+.category-item .remove-category[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

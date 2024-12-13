@@ -10,8 +10,20 @@ class WC_Demo_Products_OpenAI_Handler
         $this->generation_categories =  $this->get_product_categories();
     }
 
+    private function get_product_categories_()
+    {
+        return include(plugin_dir_path(dirname(__FILE__)) . 'includes/config/categories.php');
+    }
+
     private function get_product_categories()
     {
+        $saved_categories = get_option('wc_demo_products_categories', array());
+
+        if (!empty($saved_categories)) {
+            return $saved_categories;
+        }
+
+        // Default categories if none are saved
         return include(plugin_dir_path(dirname(__FILE__)) . 'includes/config/categories.php');
     }
 
