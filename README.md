@@ -100,6 +100,9 @@ GPL v2 or later
 
 ## Changelog
 
+### 2.1.4
+- Wording changed
+
 ### 2.1.3
 - Slug changed
 

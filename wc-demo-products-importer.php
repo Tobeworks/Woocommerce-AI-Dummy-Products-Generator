@@ -114,8 +114,8 @@ class WC_Demo_Products_Importer
     {
         $page = add_submenu_page(
             'woocommerce',
-            __('Import Demo Products', 'woo-ai-dummy-products'),
-            __('Import Demo Products', 'woo-ai-dummy-products'),
+            __('Import Dummy Products', 'woo-ai-dummy-products'),
+            __('Import Dummy Products', 'woo-ai-dummy-products'),
             'manage_woocommerce',
             'wc-demo-products',
             array($this, 'render_admin_page')
@@ -173,7 +173,7 @@ class WC_Demo_Products_Importer
         $active_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : 'import';
 ?>
         <div class="wrap">
-            <h1><?php echo esc_html__('Import Demo Products', 'woo-ai-dummy-products'); ?></h1>
+            <h1><?php echo esc_html__('Import Dummy Products', 'woo-ai-dummy-products'); ?></h1>
 
             <nav class="nav-tab-wrapper">
                 <a href="?page=wc-demo-products&tab=import"
