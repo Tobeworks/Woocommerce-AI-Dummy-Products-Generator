@@ -31,11 +31,11 @@ class WC_Demo_Products_Settings_Tab
                 <?php wp_nonce_field('wc_demo_products_settings', 'wc_demo_products_nonce'); ?>
 
                 <!-- OpenAI API Settings -->
-                <h2><?php echo esc_html__('OpenAI API Configuration', 'woo-demo-products'); ?></h2>
+                <h2><?php echo esc_html__('OpenAI API Configuration', 'woo-ai-dummy-products'); ?></h2>
                 <table class="form-table">
                     <tr>
                         <th scope="row">
-                            <label for="openai_api_key"><?php echo esc_html__('OpenAI API Key', 'woo-demo-products'); ?></label>
+                            <label for="openai_api_key"><?php echo esc_html__('OpenAI API Key', 'woo-ai-dummy-products'); ?></label>
                         </th>
                         <td>
                             <input type="text"
@@ -44,23 +44,23 @@ class WC_Demo_Products_Settings_Tab
                                 value="<?php echo esc_attr($saved_key); ?>"
                                 class="regular-text">
                             <p class="description">
-                                <?php echo esc_html__('Enter your OpenAI API key to enable AI-generated product data.', 'woo-demo-products'); ?>
+                                <?php echo esc_html__('Enter your OpenAI API key to enable AI-generated product data.', 'woo-ai-dummy-products'); ?>
                             </p>
                         </td>
                     </tr>
                 </table>
 
                 <!-- Product Categories Configuration -->
-                <h2><?php echo esc_html__('Product Categories', 'woo-demo-products'); ?></h2>
+                <h2><?php echo esc_html__('Product Categories', 'woo-ai-dummy-products'); ?></h2>
                 <table class="form-table">
                     <tr>
-                        <th scope="row"><?php echo esc_html__('Manage Categories', 'woo-demo-products'); ?></th>
+                        <th scope="row"><?php echo esc_html__('Manage Categories', 'woo-ai-dummy-products'); ?></th>
                         <td>
                             <div id="product-categories">
                                 <?php $this->render_category_list(); ?>
                             </div>
                             <button type="button" class="button add-category">
-                                <?php echo esc_html__('Add Category', 'woo-demo-products'); ?>
+                                <?php echo esc_html__('Add Category', 'woo-ai-dummy-products'); ?>
                             </button>
                         </td>
                     </tr>

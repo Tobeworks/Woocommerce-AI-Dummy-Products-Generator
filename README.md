@@ -100,6 +100,9 @@ GPL v2 or later
 
 ## Changelog
 
+### 2.1.3
+- Slug changed
+
 ### 2.1.2
 - Dynamic product categories added
 - number of products increased to 50
