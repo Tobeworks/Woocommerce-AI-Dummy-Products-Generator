@@ -5,21 +5,20 @@ A WordPress plugin that uses OpenAI (GPT & DALL-E) to generate demo products for
 ## Features
 - 🤖 AI-powered product generation using GPT-4
 - 🖼️ Professional product images using DALL-E 3
-- 📦 Generate 1-25 products at once
+- 📦 Generate 1-x products at once
 - 🌐 Support for 10 different languages
 - 🏷️ Use predefined product types
 - 📁 Save to any WooCommerce category
 - 🔄 Automatic SKU generation
 - 📝 Detailed product descriptions and features
-- 🏷️ Automatic tag generation
 - 📊 Stock management
 - 📐 Product dimensions and weight
-- 💰 Regular and sale prices
+- 💰 Regular and sale prices (30% randomy)
 
 ## Requirements
 - WordPress 5.0 or higher
 - WooCommerce 6.0 or higher
-- PHP 7.4 or higher
+- PHP 7.4 but better 8.0 or higher
 - OpenAI API key
 
 ## Installation
@@ -30,14 +29,23 @@ A WordPress plugin that uses OpenAI (GPT & DALL-E) to generate demo products for
 5. Go to WooCommerce > Import Dummy Products
 
 ## Usage
-1. Navigate to WooCommerce > Import Dummy Products
-2. Select the number of products you want to generate (1-25)
-3. Choose the type of products to generate (e.g., Electronics, Clothing)
-4. Select the WooCommerce category where products will be saved
-5. Choose your preferred content language
-6. Go to the Settings tab to enter your OpenAI API key (if not already done)
-7. Return to the Import tab and click "Generate and Import Products"
-8. Wait for the products to be generated with their images
+
+1. Navigate to WooCommerce > Import Demo Products
+2. Go to the Settings tab to:
+   - Enter your OpenAI API key
+   - Configure your product categories
+3. Go to the Import tab
+4. Configure your import:
+   - Select the number of products (1-x)
+   - Choose the product type to generate
+   - Select the target WooCommerce category
+   - Choose your preferred content language
+5. Click "Generate and Import Products"
+6. Wait for the process to complete:
+   - Products will be generated with descriptions
+   - AI images will be created and attached
+   - Progress will be shown on screen
+
 
 ## Supported Languages
 - English (en)
@@ -99,6 +107,9 @@ Developed by Tobias Lorsbach
 GPL v2 or later
 
 ## Changelog
+
+### 2.1.5
+- sale_price is called randomly on every 30% of the products
 
 ### 2.1.4
 - Wording changed

@@ -10,11 +10,6 @@ class WC_Demo_Products_OpenAI_Handler
         $this->generation_categories =  $this->get_product_categories();
     }
 
-    private function get_product_categories_()
-    {
-        return include(plugin_dir_path(dirname(__FILE__)) . 'includes/config/categories.php');
-    }
-
     private function get_product_categories()
     {
         $saved_categories = get_option('wc_demo_products_categories', array());
@@ -68,7 +63,18 @@ class WC_Demo_Products_OpenAI_Handler
                 // Set basic product data
                 $product->set_name($product_data['name']);
                 $product->set_regular_price($product_data['price']);
-                $product->set_sale_price($product_data['sale_price'] ?? '');
+
+                // Handle optional sale price
+                if (isset($product_data['sale_price']) && !empty($product_data['sale_price'])) {
+                    $regular_price = floatval($product_data['price']);
+                    $sale_price = floatval($product_data['sale_price']);
+
+                    // Validate sale price is lower than regular price
+                    if ($sale_price < $regular_price) {
+                        $product->set_sale_price($product_data['sale_price']);
+                    }
+                }
+
                 $product->set_description($product_data['long_description']);
                 $product->set_short_description($product_data['short_description']);
                 $product->set_sku($product_data['sku'] ?? '');
@@ -146,33 +152,43 @@ class WC_Demo_Products_OpenAI_Handler
                 strtoupper($language)
             );
 
-            $user_prompt = sprintf(
-                'Generate %d realistic products for the category "%s". All text should be in %s language. Include realistic prices, descriptions, and features. Return JSON in this format:
+            // Create the user prompt with proper formatting
+            $json_format = '{
+            "products": [
                 {
-                    "products": [
-                        {
-                            "name": "Product Name",
-                            "sku": "UNIQUE-SKU-123",
-                            "price": "29.99",
-                            "sale_price": "24.99",
-                            "stock_quantity": 100,
-                            "stock_status": "instock",
-                            "weight": "1.5",
-                            "dimensions": {
-                                "length": "10",
-                                "width": "5",
-                                "height": "2"
-                            },
-                            "short_description": "Brief product description",
-                            "long_description": "Detailed product description",
-                            "features": ["feature1", "feature2"],
-                            "tags": ["tag1", "tag2"]
-                        }
-                    ]
-                }',
+                    "name": "Product Name",
+                    "sku": "UNIQUE-SKU-123",
+                    "price": "29.99",
+                    "sale_price": "24.99",
+                    "stock_quantity": 100,
+                    "stock_status": "instock",
+                    "weight": "1.5",
+                    "dimensions": {
+                        "length": "10",
+                        "width": "5",
+                        "height": "2"
+                    },
+                    "short_description": "Brief product description",
+                    "long_description": "Detailed product description",
+                    "features": ["feature1", "feature2"],
+                    "tags": ["tag1", "tag2"]
+                }
+            ]
+        }';
+
+            $user_prompt = sprintf(
+                'Generate %d realistic products for the category "%s". All text should be in %s language. 
+            IMPORTANT PRICING RULES:
+            - Each product should have a regular price
+            - Randomly decide for each product if it should be on sale (approximately 30%% of products)
+            - If a product is on sale, set sale_price to 10-30%% lower than regular_price
+            - If a product is not on sale, omit the sale_price field completely
+
+            Return JSON in this exact format: %s',
                 $count,
                 $category_name,
-                strtoupper($language)
+                strtoupper($language),
+                $json_format
             );
 
             $response = wp_remote_post('https://api.openai.com/v1/chat/completions', array(

@@ -12,10 +12,6 @@ class WC_Demo_Products_Import_Tab
         $this->openai_handler = new WC_Demo_Products_OpenAI_Handler($this->options);
     }
 
-    private function get_product_categorie_()
-    {
-        return include(plugin_dir_path(dirname(__FILE__)) . 'includes/config/categories.php');
-    }
     private function get_product_categories()
     {
         $saved_categories = get_option('wc_demo_products_categories', array());
