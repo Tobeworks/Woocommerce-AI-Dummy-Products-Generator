@@ -13,7 +13,7 @@ A WordPress plugin that uses OpenAI (GPT & DALL-E) to generate demo products for
 - 📝 Detailed product descriptions and features
 - 📊 Stock management
 - 📐 Product dimensions and weight
-- 💰 Regular and sale prices (30% randomy)
+- 💰 Regular and sale prices (30% randomly)
 
 ## Requirements
 - WordPress 5.0 or higher
